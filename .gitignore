@@ -58,7 +58,7 @@ Thumbs.db
 
 # PyCharm
 *.iml
-.idea/*
+.idea/
 
 # Eric6
 *.epj

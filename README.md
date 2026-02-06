@@ -1,2 +1,3 @@
 # YoutubeVideoDownload
-Baixa videos do Youtube com resolução média e faz download apenas do audio do vídeo.
+Programa feito em python usando a lib do pytubefix para baixar videos do Youtube,
+e utiliza o pysimplegui para gerar uma interfaçe interativa para o usuário.
