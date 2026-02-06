@@ -18,28 +18,28 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "history": [
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;history&quot;: [
     {
-      "state": "OPEN",
-      "author": "TiagoAlbuquerqueSantos"
+      &quot;state&quot;: &quot;OPEN&quot;,
+      &quot;author&quot;: &quot;TiagoAlbuquerqueSantos&quot;
     }
   ],
-  "lastFilter": {}
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/TiagoAlbuquerqueSantos/YoutubeVideoDownload.git",
-    "accountId": "951577ee-c6fc-4b54-8279-9ae2727113d2"
+  &quot;lastFilter&quot;: {}
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/TiagoAlbuquerqueSantos/YoutubeVideoDownload.git&quot;,
+    &quot;accountId&quot;: &quot;951577ee-c6fc-4b54-8279-9ae2727113d2&quot;
   }
-}]]></component>
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="39JS7KsNEz8j8eqt1BdZMDrQHAi" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -52,6 +52,7 @@
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "/home/Tiago/Documentos/GitHub"
   }
 }]]></component>
