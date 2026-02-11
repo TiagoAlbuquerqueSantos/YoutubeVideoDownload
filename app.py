@@ -6,7 +6,7 @@ class FormatArq(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
         self.grid_columnconfigure(0, weight=1)
-        self._border_width = 2
+        self._border_width = 1
 
         self.texto = ctk.CTkLabel(
             self,
@@ -29,7 +29,7 @@ class ResVideo(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
         self.grid_columnconfigure(0, weight=1)
-        self._border_width = 2
+        self._border_width = 1
 
         self.texto = ctk.CTkLabel(
             self,
@@ -52,13 +52,14 @@ class QualidadeAudio(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
         self.grid_columnconfigure(0, weight=1)
-        self._border_width = 2
+        self._border_width = 1
 
         self.texto = ctk.CTkLabel(
             self,
             text='Resolução do Vídeo',
             corner_radius=6,
             fg_color='gray30',
+            state='normal'
         )
         self.texto.grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
 
@@ -67,6 +68,7 @@ class QualidadeAudio(ctk.CTkFrame):
             values=['128kbps', '144kbps'],
             width=150,
             height=30,
+            state='normal'
         )
         self.formato_arquivo.grid(row=1, column=0, padx=10, pady=10, sticky='nsew')
 
@@ -74,13 +76,13 @@ class QualidadeAudio(ctk.CTkFrame):
 class Content(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
-        self._border_width = 2
+        self._border_width = 1
         self.grid_columnconfigure((0, 1, 2), weight=1)
-       # self.grid_rowconfigure(0, weight=1)
 
         self.entrada_usr = ctk.CTkEntry(
             self,
             placeholder_text='Digite a URL do Youtube',
+            border_width=1,
             height=30
         )
         self.entrada_usr.grid(row=0, column=0, padx=10, pady=10, sticky='ew', columnspan=3)
@@ -97,18 +99,30 @@ class Content(ctk.CTkFrame):
         self.btn = ctk.CTkButton(
             self,
             text='Baixar',
-            width=150,
+            width=160,
             height=30,
-            border_color='white',
+            border_width=1,
         )
         self.btn.grid(row=3, column=0, padx=10, pady=10, sticky='w')
+
+        self.seletor_tema = ctk.CTkOptionMenu(
+            self,
+            values=['dark', 'light', 'system'],
+            width=150,
+            height=30,
+            command=self.change_theme,
+        )
+     #   self.seletor_tema.grid(row=3, column=1, padx=10, pady=10, sticky='w')
+
+    def change_theme(self, new_theme):
+        ctk.set_appearance_mode(new_theme)
 
 
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         ctk.set_appearance_mode('dark')
-      #  ctk.set_default_color_theme('themes/midnight.json')
+        ctk.set_default_color_theme('themes/Cobalt.json')
 
         self.geometry('540x350')
         self.grid_columnconfigure([0], weight=1)
