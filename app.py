@@ -2,122 +2,6 @@
 import customtkinter as ctk
 
 
-class FormatArq(ctk.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master)
-        self.grid_columnconfigure(0, weight=1)
-        self._border_width = 1
-
-        self.texto = ctk.CTkLabel(
-            self,
-            text='Formato do Arquivo',
-            corner_radius=6,
-            fg_color='gray30',
-        )
-        self.texto.grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
-
-        self.formato_arquivo = ctk.CTkOptionMenu(
-            self,
-            values=['mp4', 'mp3'],
-            width=150,
-            height=30,
-        )
-        self.formato_arquivo.grid(row=1, column=0, padx=10, pady=10, sticky='nsew')
-
-
-class ResVideo(ctk.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master)
-        self.grid_columnconfigure(0, weight=1)
-        self._border_width = 1
-
-        self.texto = ctk.CTkLabel(
-            self,
-            text='Resolução do Vídeo',
-            corner_radius=6,
-            fg_color='gray30',
-        )
-        self.texto.grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
-
-        self.formato_arquivo = ctk.CTkOptionMenu(
-            self,
-            values=['720p', '360p'],
-            width=150,
-            height=30,
-        )
-        self.formato_arquivo.grid(row=1, column=0, padx=10, pady=10, sticky='nsew')
-
-
-class QualidadeAudio(ctk.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master)
-        self.grid_columnconfigure(0, weight=1)
-        self._border_width = 1
-
-        self.texto = ctk.CTkLabel(
-            self,
-            text='Resolução do Vídeo',
-            corner_radius=6,
-            fg_color='gray30',
-            state='normal'
-        )
-        self.texto.grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
-
-        self.formato_arquivo = ctk.CTkOptionMenu(
-            self,
-            values=['128kbps', '144kbps'],
-            width=150,
-            height=30,
-            state='normal'
-        )
-        self.formato_arquivo.grid(row=1, column=0, padx=10, pady=10, sticky='nsew')
-
-
-class Content(ctk.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master)
-        self._border_width = 1
-        self.grid_columnconfigure((0, 1, 2), weight=1)
-
-        self.entrada_usr = ctk.CTkEntry(
-            self,
-            placeholder_text='Digite a URL do Youtube',
-            border_width=1,
-            height=30
-        )
-        self.entrada_usr.grid(row=0, column=0, padx=10, pady=10, sticky='ew', columnspan=3)
-
-        self.frame_layout_1 = FormatArq(self)
-        self.frame_layout_1.grid(row=2, column=0, padx=10, pady=10, sticky='w')
-
-        self.frame_layout_2 = ResVideo(self)
-        self.frame_layout_2.grid(row=2, column=1, padx=10, pady=10, sticky='w')
-
-        self.frame_layout_3 = QualidadeAudio(self)
-        self.frame_layout_3.grid(row=2, column=2, padx=10, pady=10, sticky='w')
-
-        self.btn = ctk.CTkButton(
-            self,
-            text='Baixar',
-            width=160,
-            height=30,
-            border_width=1,
-        )
-        self.btn.grid(row=3, column=0, padx=10, pady=10, sticky='w')
-
-        self.seletor_tema = ctk.CTkOptionMenu(
-            self,
-            values=['dark', 'light', 'system'],
-            width=150,
-            height=30,
-            command=self.change_theme,
-        )
-     #   self.seletor_tema.grid(row=3, column=1, padx=10, pady=10, sticky='w')
-
-    def change_theme(self, new_theme):
-        ctk.set_appearance_mode(new_theme)
-
-
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -130,9 +14,94 @@ class App(ctk.CTk):
         self.title('Baixador de vídeos do Youtube')
         self.resizable(False, False)
 
-        self.content = Content(self)
-        self.content.grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
+        self.conteudo = ctk.CTkFrame(self, border_width=1)
 
+        self.frame_layout_1 = ctk.CTkFrame(self.conteudo, border_width=1)
+        self.frame_layout_2 = ctk.CTkFrame(self.conteudo, border_width=1)
+        self.frame_layout_3 = ctk.CTkFrame(self.conteudo, border_width=1)
+
+        self.conteudo.grid_columnconfigure((0, 1, 2), weight=1)
+        self.frame_layout_1.grid_columnconfigure(0, weight=1)
+        self.frame_layout_2.grid_columnconfigure(0, weight=1)
+        self.frame_layout_3.grid_columnconfigure(0, weight=1)
+
+        self.conteudo.grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
+        self.frame_layout_1.grid(row=2, column=0, padx=10, pady=10, sticky='w')
+        self.frame_layout_2.grid(row=2, column=1, padx=10, pady=10, sticky='w')
+        self.frame_layout_3.grid(row=2, column=2, padx=10, pady=10, sticky='w')
+
+        self.entrada_usr = ctk.CTkEntry(
+            self.conteudo,
+            placeholder_text='Digite a URL do Youtube',
+            border_width=1,
+            height=30
+        )
+        self.entrada_usr.grid(row=0, column=0, padx=10, pady=10, sticky='ew', columnspan=3)
+
+        ctk.CTkLabel(
+            self.frame_layout_1,
+            text='Formato do Arquivo',
+            corner_radius=6,
+            fg_color='gray30',
+        ).grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
+
+        ctk.CTkLabel(
+            self.frame_layout_2,
+            text='Resolução do Vídeo',
+            corner_radius=6,
+            fg_color='gray30',
+        ).grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
+
+        ctk.CTkLabel(
+            self.frame_layout_3,
+            text='Config. de Áudio',
+            corner_radius=6,
+            fg_color='gray30',
+        ).grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
+
+        self.formato_arquivo = ctk.CTkOptionMenu(
+            self.frame_layout_1,
+            values=['mp4', 'mp3'],
+            width=150,
+            height=30,
+        )
+        self.formato_arquivo.grid(row=1, column=0, padx=10, pady=10, sticky='nsew')
+
+        self.res_video = ctk.CTkOptionMenu(
+            self.frame_layout_2,
+            values=['720p', '360p'],
+            width=150,
+            height=30,
+        )
+        self.res_video.grid(row=1, column=0, padx=10, pady=10, sticky='nsew')
+
+        self.config_audio = ctk.CTkOptionMenu(
+            self.frame_layout_3,
+            values=['128kbps', '144kbps'],
+            width=150,
+            height=30,
+        )
+        self.config_audio.grid(row=1, column=0, padx=10, pady=10, sticky='nsew')
+
+        self.btn = ctk.CTkButton(
+            self.conteudo,
+            text='Baixar',
+            width=160,
+            height=30,
+            border_width=1,
+        )
+        self.btn.grid(row=3, column=0, padx=10, pady=10, sticky='w')
+
+        # ctk.CTkOptionMenu(
+        #     self.conteudo,
+        #     values=['dark', 'light', 'system'],
+        #     width=150,
+        #     height=30,
+        #     command=self.change_theme,
+        # ).grid(row=3, column=1, padx=10, pady=10, sticky='w')
+
+    def change_theme(self, new_theme):
+        ctk.set_appearance_mode(new_theme)
 
 if __name__ == '__main__':
     app = App()
