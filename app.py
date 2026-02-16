@@ -2,9 +2,59 @@
 import customtkinter as ctk
 
 
+class DownloadVideo(ctk.CTkToplevel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.geometry('400x200')
+        self.resizable(False, False)
+
+        ctk.CTkLabel(
+            self,
+            text='Baixando Vídeo...',
+            width=150,
+            height=30,
+        ).place(relx=0.5, rely=0.2, anchor='center')
+
+        self.barra_progresso = ctk.CTkProgressBar(
+            self,
+            orientation='horizontal',
+            indeterminate_speed=0.5,
+            mode='indeterminate',
+            width=300,
+        )
+        self.barra_progresso.place(relx=0.5, rely=0.5, anchor='center')
+        self.barra_progresso.start()
+
+        self.btn_concluir = ctk.CTkButton(
+            self,
+            text='Concluir',
+            width=140,
+            height=30,
+            border_width=1,
+            command=self.fechar_janela,
+            state='disabled'
+        )
+        self.btn_concluir.place(relx=0.47, rely=0.87, anchor='se')
+
+        self.btn_cancelar = ctk.CTkButton(
+            self,
+            text='Cancelar',
+            width=140,
+            height=30,
+            border_width=1,
+            command=self.fechar_janela,
+        )
+        self.btn_cancelar.place(relx=0.53, rely=0.87, anchor='sw')
+
+    def fechar_janela(self):
+        self.destroy()
+
+
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
+        self.segunda_janela = None
+
         ctk.set_appearance_mode('dark')
         ctk.set_default_color_theme('themes/Cobalt.json')
 
@@ -64,6 +114,7 @@ class App(ctk.CTk):
             values=['mp4', 'mp3'],
             width=150,
             height=30,
+            command=self.esconder_menu_res_video,
         )
         self.formato_arquivo.grid(row=1, column=0, padx=10, pady=10, sticky='nsew')
 
@@ -80,6 +131,7 @@ class App(ctk.CTk):
             values=['128kbps', '144kbps'],
             width=150,
             height=30,
+            state='disabled',
         )
         self.config_audio.grid(row=1, column=0, padx=10, pady=10, sticky='nsew')
 
@@ -89,6 +141,7 @@ class App(ctk.CTk):
             width=160,
             height=30,
             border_width=1,
+            command=self.abrir_segunda_janela,
         )
         self.btn.grid(row=3, column=0, padx=10, pady=10, sticky='w')
 
@@ -102,6 +155,24 @@ class App(ctk.CTk):
 
     def change_theme(self, new_theme):
         ctk.set_appearance_mode(new_theme)
+
+    def esconder_menu_res_video(self, valor):
+        if valor == 'mp3':
+            self.res_video.configure(state='disabled')
+        else:
+            self.res_video.configure(state='normal')
+
+        if valor == 'mp4':
+            self.config_audio.configure(state='disabled')
+        else:
+            self.config_audio.configure(state='normal')
+
+    def abrir_segunda_janela(self):
+        if self.segunda_janela is None or not self.segunda_janela.winfo_exists():
+            self.segunda_janela = DownloadVideo()
+        else:
+            self.segunda_janela.focus()
+
 
 if __name__ == '__main__':
     app = App()
