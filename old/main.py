@@ -1,5 +1,5 @@
 import PySimpleGUI as sg
-from sources.ytdownl_config import *
+from ytdownl_config import *
 
 
 class Interface:

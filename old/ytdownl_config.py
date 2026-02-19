@@ -1,16 +1,17 @@
-from pytubefix import YouTube
+
 import os
+from pytubefix import YouTube
 from moviepy import AudioFileClip
 
-def ler_arquivo(local):
-    file = open(local + '.txt', 'r')
-    dados = file.read()
-    return dados
-
-def gravar_arquivo(local, dados):
-    file = open(local + '.txt', 'w')
-    file.write(dados)
-    file.close()
+#def ler_arquivo(local):
+#    file = open(local + '.txt', 'r')
+#    dados = file.read()
+#    return dados
+#
+#def gravar_arquivo(local, dados):
+#    file = open(local + '.txt', 'w')
+#    file.write(dados)
+#    file.close()
 
 def sanitize_filename(filename):
     return "".join(c if c.isalnum() else "_" for c in filename)
