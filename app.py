@@ -102,7 +102,7 @@ class App(ctk.CTk):
         self.segunda_janela = None
 
         ctk.set_appearance_mode('dark')
-        ctk.set_default_color_theme('themes/Cobalt.json')
+        ctk.set_default_color_theme('Cobalt_theme.json')
 
         self.geometry('540x350')
         self.grid_columnconfigure([0], weight=1)
@@ -199,17 +199,6 @@ class App(ctk.CTk):
             justify='center',
         ).grid(row=3, column=0, padx=10, pady=10, sticky='nsew')
 
-        # ctk.CTkOptionMenu(
-        #     self.conteudo,
-        #     values=['dark', 'light', 'system'],
-        #     width=150,
-        #     height=30,
-        #     command=self.change_theme,
-        # ).grid(row=3, column=1, padx=10, pady=10, sticky='w')
-
-    def change_theme(self, new_theme):
-        ctk.set_appearance_mode(new_theme)
-
     def esconder_menu_res_video(self, valor):
         if valor == 'mp3':
             self.res_video.configure(state='disabled')
@@ -260,39 +249,44 @@ class App(ctk.CTk):
             yt = YouTube(url, 'WEB')
             self.segunda_janela.update_status(f'Obtendo streams para: {yt.title[:40]}...')
 
-            if file_type == 'mp4':
+            if self.formato_arquivo == 'mp4':
                 streams = yt.streams.filter(progressive=True, file_extension='mp4')
                 available_resolutions = get_available_resolutions(streams)
+
                 if resolution and resolution not in available_resolutions:
                     raise Exception(
                         f"Resolução {resolution} não disponível. Resoluções disponíveis: {', '.join(available_resolutions)}")
                 elif not resolution:
                     resolution = available_resolutions[-1]
+
                 self.segunda_janela.update_status(f'Baixando vídeo em {resolution}...')
                 self.video_stream = streams.filter(res=resolution).first()
-            elif file_type == 'mp3':
+
+            elif self.formato_arquivo == 'mp3':
                 streams = yt.streams.filter(only_audio=True, file_extension='mp4')
                 available_qualities = get_available_audio_qualities(streams)
+
                 if resolution and resolution not in available_qualities:
                     raise Exception(
                         f"Qualidade de áudio {resolution} não disponível. Qualidades disponíveis: {', '.join(available_qualities)}")
                 elif not resolution:
                     resolution = available_qualities[-1]
                 self.segunda_janela.update_status(f'Baixando áudio em {resolution}...')
+
                 self.video_stream = streams.filter(abr=resolution).first()
 
             if not self.video_stream:
                 raise Exception(
-                    f"Nenhum stream disponível para a combinação escolhida de resolução/qualidade {resolution} e tipo {file_type}.")
+                    f"Nenhum stream disponível para a combinação escolhida de resolução/qualidade {resolution} e tipo {self.formato_arquivo.get()}.")
 
             if output_path is None:
                 sanitized_title = sanitize_filename(yt.title)
-                output_path = sanitized_title + ('.mp4' if file_type == 'mp4' else '.mp3')
+                output_path = sanitized_title + ('.mp4' if self.formato_arquivo == 'mp4' else '.mp3')
 
             self.segunda_janela.update_status(f'Salvando arquivo: {output_path}')
             download_path = self.video_stream.download(output_path=output_path)
 
-            if file_type == 'mp3':
+            if self.formato_arquivo == 'mp3':
                 audio_output_path = output_path
                 self.segunda_janela.update_status('Convertendo para MP3...')
                 with AudioFileClip(download_path) as audio:
