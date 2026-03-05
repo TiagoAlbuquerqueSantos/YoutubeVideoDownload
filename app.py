@@ -102,9 +102,9 @@ class App(ctk.CTk):
         self.segunda_janela = None
 
         ctk.set_appearance_mode('dark')
-        ctk.set_default_color_theme('Cobalt_theme.json')
+        ctk.set_default_color_theme('themes/Cobalt.json')
 
-        self.geometry('540x500')
+        self.geometry('540x350')
         self.grid_columnconfigure([0], weight=1)
         self.grid_rowconfigure([0], weight=1)
         self.title('Baixador de vídeos do Youtube')
@@ -122,9 +122,9 @@ class App(ctk.CTk):
         self.frame_layout_3.grid_columnconfigure(0, weight=1)
 
         self.conteudo.grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
-        self.frame_layout_1.grid(row=3, column=0, padx=10, pady=10, sticky='w')
-        self.frame_layout_2.grid(row=3, column=1, padx=10, pady=10, sticky='w')
-        self.frame_layout_3.grid(row=3, column=2, padx=10, pady=10, sticky='w')
+        self.frame_layout_1.grid(row=2, column=0, padx=10, pady=10, sticky='w')
+        self.frame_layout_2.grid(row=2, column=1, padx=10, pady=10, sticky='w')
+        self.frame_layout_3.grid(row=2, column=2, padx=10, pady=10, sticky='w')
 
         self.url_video = ctk.CTkEntry(
             self.conteudo,
@@ -132,20 +132,7 @@ class App(ctk.CTk):
             border_width=1,
             height=30
         )
-        self.url_video.grid(row=1, column=0, padx=10, pady=10, sticky='ew', columnspan=3)
-
-        self.caixa_info = ctk.CTkTextbox(
-            self.conteudo,
-        ).grid(row=2, column=0, padx=10, sticky='ew', columnspan=3)
-
-        ctk.CTkButton(
-            self.conteudo,
-            text='Baixar',
-            width=160,
-            height=30,
-            border_width=1,
-            command=self.abrir_segunda_janela,
-        ).grid(row=4, column=0, padx=10, sticky='w')
+        self.url_video.grid(row=0, column=0, padx=10, pady=10, sticky='ew', columnspan=3)
 
         ctk.CTkLabel(
             self.frame_layout_1,
@@ -194,13 +181,34 @@ class App(ctk.CTk):
         )
         self.config_audio.grid(row=1, column=0, padx=10, pady=10, sticky='nsew')
 
-        ctk.CTkLabel(
+        self.btn = ctk.CTkButton(
+            self.conteudo,
+            text='Baixar',
+            width=160,
+            height=30,
+            border_width=1,
+            command=self.abrir_segunda_janela,
+        )
+        self.btn.grid(row=3, column=0, padx=10, pady=10, sticky='w')
+
+        self.texto = ctk.CTkLabel(
             self,
             text='Digite a URL do vídeo do Youtube que deseja baixar,'
                  ' escolha o formato do arquivo, a resolução do vídeo ou a qualidade do áudio e clique em "Baixar".',
             wraplength=500,
             justify='center',
         ).grid(row=3, column=0, padx=10, pady=10, sticky='nsew')
+
+        # ctk.CTkOptionMenu(
+        #     self.conteudo,
+        #     values=['dark', 'light', 'system'],
+        #     width=150,
+        #     height=30,
+        #     command=self.change_theme,
+        # ).grid(row=3, column=1, padx=10, pady=10, sticky='w')
+
+    def change_theme(self, new_theme):
+        ctk.set_appearance_mode(new_theme)
 
     def esconder_menu_res_video(self, valor):
         if valor == 'mp3':
@@ -237,7 +245,7 @@ class App(ctk.CTk):
         # Iniciar download em uma thread separada
         download_thread = threading.Thread(
             target=self.download_video,
-            args=(url, resolution, None),
+            args=(url, resolution, file_type, None),
         )
         download_thread.daemon = True
         download_thread.start()
@@ -246,51 +254,45 @@ class App(ctk.CTk):
         """Callback chamado quando o download é concluído com sucesso"""
         self.url_video.delete(0, 'end')
 
-    def download_video(self, url, resolution=None, output_path=None):
+    def download_video(self, url, resolution=None, file_type='mp4', output_path=None):
         try:
             self.segunda_janela.update_status('Conectando ao YouTube...')
             yt = YouTube(url, 'WEB')
             self.segunda_janela.update_status(f'Obtendo streams para: {yt.title[:40]}...')
 
-            if self.formato_arquivo.get() == 'mp4':
+            if file_type == 'mp4':
                 streams = yt.streams.filter(progressive=True, file_extension='mp4')
                 available_resolutions = get_available_resolutions(streams)
-
                 if resolution and resolution not in available_resolutions:
                     raise Exception(
                         f"Resolução {resolution} não disponível. Resoluções disponíveis: {', '.join(available_resolutions)}")
                 elif not resolution:
                     resolution = available_resolutions[-1]
-
                 self.segunda_janela.update_status(f'Baixando vídeo em {resolution}...')
                 self.video_stream = streams.filter(res=resolution).first()
-
-            elif self.formato_arquivo.get() == 'mp3':
+            elif file_type == 'mp3':
                 streams = yt.streams.filter(only_audio=True, file_extension='mp4')
                 available_qualities = get_available_audio_qualities(streams)
-
                 if resolution and resolution not in available_qualities:
                     raise Exception(
                         f"Qualidade de áudio {resolution} não disponível. Qualidades disponíveis: {', '.join(available_qualities)}")
                 elif not resolution:
                     resolution = available_qualities[-1]
                 self.segunda_janela.update_status(f'Baixando áudio em {resolution}...')
-
                 self.video_stream = streams.filter(abr=resolution).first()
 
             if not self.video_stream:
                 raise Exception(
-                    f"Nenhum stream disponível para a combinação escolhida de resolução/qualidade {resolution} e tipo {self.formato_arquivo.get()}.")
+                    f"Nenhum stream disponível para a combinação escolhida de resolução/qualidade {resolution} e tipo {file_type}.")
 
             if output_path is None:
                 sanitized_title = sanitize_filename(yt.title)
-                output_path = sanitized_title + ('.mp4' if self.formato_arquivo.get() == 'mp4' else '.mp3')
+                output_path = sanitized_title + ('.mp4' if file_type == 'mp4' else '.mp3')
 
-            self.segunda_janela.update_status(f'Salvando arquivo:\n {output_path}')
+            self.segunda_janela.update_status(f'Salvando arquivo: {output_path}')
             download_path = self.video_stream.download(output_path=output_path)
 
-            if self.formato_arquivo.get() == 'mp3':
-                print('Convertendo para MP3...')
+            if file_type == 'mp3':
                 audio_output_path = output_path
                 self.segunda_janela.update_status('Convertendo para MP3...')
                 with AudioFileClip(download_path) as audio:
@@ -299,12 +301,10 @@ class App(ctk.CTk):
 
             self.segunda_janela.download_complete_ui()
             print(f"Download concluído! Arquivo salvo em: {output_path}")
-          #  self.segunda_janela.fechar_janela()
         except Exception as e:
             error_message = str(e)
             print(f"Ocorreu um erro durante o download: {error_message}")
             self.segunda_janela.download_error_ui(error_message)
-          #  self.segunda_janela.fechar_janela()
 
 
 if __name__ == '__main__':
