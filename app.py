@@ -98,6 +98,7 @@ class DownloadVideo(ctk.CTkToplevel):
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
+        self.qualidade_arq = None
         self.video_stream = None
         self.segunda_janela = None
 
@@ -194,21 +195,11 @@ class App(ctk.CTk):
         self.texto = ctk.CTkLabel(
             self,
             text='Digite a URL do vídeo do Youtube que deseja baixar,'
-                 ' escolha o formato do arquivo, a resolução do vídeo ou a qualidade do áudio e clique em "Baixar".',
+                 ' escolha o formato do arquivo, a resolução do vídeo'
+                 ' ou a qualidade do áudio e clique em "Baixar".',
             wraplength=500,
             justify='center',
         ).grid(row=3, column=0, padx=10, pady=10, sticky='nsew')
-
-        # ctk.CTkOptionMenu(
-        #     self.conteudo,
-        #     values=['dark', 'light', 'system'],
-        #     width=150,
-        #     height=30,
-        #     command=self.change_theme,
-        # ).grid(row=3, column=1, padx=10, pady=10, sticky='w')
-
-    def change_theme(self, new_theme):
-        ctk.set_appearance_mode(new_theme)
 
     def esconder_menu_res_video(self, valor):
         if valor == 'mp3':
@@ -223,8 +214,7 @@ class App(ctk.CTk):
 
     def abrir_segunda_janela(self):
         # Validar URL
-        url = self.url_video.get().strip()
-        if not url:
+        if not self.url_video.get().strip():
             messagebox.showerror(
                 'Erro',
                 'Por favor, digite uma URL do YouTube válida.',
@@ -232,8 +222,7 @@ class App(ctk.CTk):
             return
 
         # Obter configurações selecionadas
-        file_type = self.formato_arquivo.get()
-        resolution = self.res_video.get() if file_type == 'mp4' else self.config_audio.get()
+        self.qualidade_arq = self.res_video.get() if self.formato_arquivo.get() == 'mp4' else self.config_audio.get()
 
         # Abrir janela de download
         if self.segunda_janela is None or not self.segunda_janela.winfo_exists():
@@ -243,10 +232,7 @@ class App(ctk.CTk):
             return
 
         # Iniciar download em uma thread separada
-        download_thread = threading.Thread(
-            target=self.download_video,
-            args=(url, resolution, file_type, None),
-        )
+        download_thread = threading.Thread(target=self.download_video,)
         download_thread.daemon = True
         download_thread.start()
 
@@ -254,45 +240,51 @@ class App(ctk.CTk):
         """Callback chamado quando o download é concluído com sucesso"""
         self.url_video.delete(0, 'end')
 
-    def download_video(self, url, resolution=None, file_type='mp4', output_path=None):
+    def download_video(self, output_path=None):
         try:
             self.segunda_janela.update_status('Conectando ao YouTube...')
-            yt = YouTube(url, 'WEB')
+            yt = YouTube(self.url_video.get().strip())
+
             self.segunda_janela.update_status(f'Obtendo streams para: {yt.title[:40]}...')
 
-            if file_type == 'mp4':
+            if self.formato_arquivo.get() == 'mp4':
                 streams = yt.streams.filter(progressive=True, file_extension='mp4')
                 available_resolutions = get_available_resolutions(streams)
-                if resolution and resolution not in available_resolutions:
+
+                if self.qualidade_arq and self.qualidade_arq not in available_resolutions:
                     raise Exception(
-                        f"Resolução {resolution} não disponível. Resoluções disponíveis: {', '.join(available_resolutions)}")
-                elif not resolution:
-                    resolution = available_resolutions[-1]
-                self.segunda_janela.update_status(f'Baixando vídeo em {resolution}...')
-                self.video_stream = streams.filter(res=resolution).first()
-            elif file_type == 'mp3':
+                        f"Resolução {self.qualidade_arq} não disponível. Resoluções disponíveis: {', '.join(available_resolutions)}")
+                elif not self.qualidade_arq:
+                    self.qualidade_arq = available_resolutions[-1]
+
+                self.segunda_janela.update_status(f'Baixando vídeo em {self.qualidade_arq}...')
+                self.video_stream = streams.filter(res=self.qualidade_arq).first()
+
+            elif self.formato_arquivo.get() == 'mp3':
                 streams = yt.streams.filter(only_audio=True, file_extension='mp4')
                 available_qualities = get_available_audio_qualities(streams)
-                if resolution and resolution not in available_qualities:
+
+                if self.qualidade_arq and self.qualidade_arq not in available_qualities:
                     raise Exception(
-                        f"Qualidade de áudio {resolution} não disponível. Qualidades disponíveis: {', '.join(available_qualities)}")
-                elif not resolution:
-                    resolution = available_qualities[-1]
-                self.segunda_janela.update_status(f'Baixando áudio em {resolution}...')
-                self.video_stream = streams.filter(abr=resolution).first()
+                        f"Qualidade de áudio {self.qualidade_arq} não disponível. Qualidades disponíveis: {', '.join(available_qualities)}")
+                elif not self.qualidade_arq:
+                    self.qualidade_arq = available_qualities[-1]
+
+                self.segunda_janela.update_status(f'Baixando áudio em {self.qualidade_arq}...')
+                self.video_stream = streams.filter(abr=self.qualidade_arq).first()
 
             if not self.video_stream:
                 raise Exception(
-                    f"Nenhum stream disponível para a combinação escolhida de resolução/qualidade {resolution} e tipo {file_type}.")
+                    f"Nenhum stream disponível para a combinação escolhida de resolução/qualidade {self.qualidade_arq} e tipo {self.formato_arquivo.get()}.")
 
             if output_path is None:
                 sanitized_title = sanitize_filename(yt.title)
-                output_path = sanitized_title + ('.mp4' if file_type == 'mp4' else '.mp3')
+                output_path = sanitized_title + ('.mp4' if self.formato_arquivo.get() == 'mp4' else '.mp3')
 
             self.segunda_janela.update_status(f'Salvando arquivo: {output_path}')
             download_path = self.video_stream.download(output_path=output_path)
 
-            if file_type == 'mp3':
+            if self.formato_arquivo.get() == 'mp3':
                 audio_output_path = output_path
                 self.segunda_janela.update_status('Convertendo para MP3...')
                 with AudioFileClip(download_path) as audio:
