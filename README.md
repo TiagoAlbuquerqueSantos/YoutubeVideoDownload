@@ -1,7 +1,5 @@
 # YoutubeVideoDownload
 
-<hr>
-
 Programa feito em python usando a lib do pytubefix para baixar videos do Youtube,
 e utiliza o CustomTkinter para gerar uma interface interativa para o usuário.
 
