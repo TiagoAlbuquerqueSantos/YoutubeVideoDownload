@@ -7,14 +7,14 @@ from pytubefix import YouTube
 from moviepy import AudioFileClip
 
 
-def sanitize_filename(filename):
+def sanitize_filename(filename) -> str:
     return "".join(c if c.isalnum() else "_" for c in filename)
 
-def get_available_resolutions(streams):
+def get_available_resolutions(streams) -> list:
     resolutions = sorted({stream.resolution for stream in streams.filter(progressive=True)}, key=lambda x: int(x[:-1]))
     return resolutions
 
-def get_available_audio_qualities(streams):
+def get_available_audio_qualities(streams) -> list:
     qualities = sorted({stream.abr for stream in streams.filter(only_audio=True)}, key=lambda x: int(x[:-4]))
     return qualities
 
@@ -288,7 +288,7 @@ class App(ctk.CTk):
                 audio_output_path = output_path
                 self.segunda_janela.update_status('Convertendo para MP3...')
                 with AudioFileClip(download_path) as audio:
-                    audio.write_audiofile(audio_output_path, verbose=False, logger=None)
+                    audio.write_audiofile(audio_output_path)
                 os.remove(download_path)
 
             self.segunda_janela.download_complete_ui()
