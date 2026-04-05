@@ -282,7 +282,7 @@ class App(ctk.CTk):
                 output_path = sanitized_title + ('.mp4' if self.formato_arquivo.get() == 'mp4' else '.mp3')
 
             self.segunda_janela.update_status(f'Salvando arquivo: {output_path}')
-            download_path = self.video_stream.download(output_path=output_path)
+            download_path = self.video_stream.download(output_path=output_path) #type: ignore
 
             if self.formato_arquivo.get() == 'mp3':
                 audio_output_path = output_path
